@@ -18,9 +18,16 @@ class ProdutoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return ProdutoResource::collection(Produto::latest()->paginate(10));
+        $filtros = [
+            'search'     => $request->query('search'),
+            'preco_min'  => $request->query('preco_min'),
+            'preco_max'  => $request->query('preco_max'),
+            'em_estoque' => $request->query('em_estoque'),
+        ];
+
+        return ProdutoResource::collection($this->service->listar($filtros));
     }
 
     /**
@@ -51,7 +58,7 @@ class ProdutoController extends Controller
     {
         $dados = $request->validated();
 
-        $produto->update($dados);
+        $produto = $this->service->update($produto, $dados);
 
         return new ProdutoResource($produto);
     }
@@ -61,7 +68,8 @@ class ProdutoController extends Controller
      */
     public function destroy(Produto $produto)
     {
-        $produto->delete();
+        $this->service->delete($produto);
+
         return response()->noContent(); // 204
     }
 

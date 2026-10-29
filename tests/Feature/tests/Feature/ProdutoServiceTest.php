@@ -18,7 +18,7 @@ class ProdutoServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new ProdutoService();
+        $this->service = app(ProdutoService::class);
     }
 
     private function criarProduto(): Produto
@@ -73,5 +73,14 @@ class ProdutoServiceTest extends TestCase
         }
 
         $this->assertEquals(150.0, (float) $produto->fresh()->preco);
+    }
+
+    public function test_delete_remove_o_produto(): void
+    {
+        $produto = $this->criarProduto();
+
+        $this->service->delete($produto);
+
+        $this->assertDatabaseMissing('produtos', ['id' => $produto->id]);
     }
 }
